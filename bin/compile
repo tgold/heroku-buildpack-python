@@ -161,7 +161,7 @@ fi
 if [ ! "$SKIP_INSTALL" ]; then
   bpwatch start install_python
     puts-step "Preparing Python runtime ($PYTHON_VERSION)"
-    curl http://envy-versions.s3.amazonaws.com/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
+    curl --proxy http://proxy.de.abb.com:8080 http://envy-versions.s3.amazonaws.com/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
     if [[ $? != 0 ]] ; then
       puts-warn "Requested runtime ($PYTHON_VERSION) was not found."
       puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
@@ -215,7 +215,7 @@ bpwatch stop pylibmc_install
 echo "Install Mercurial if it appears to be required."
 if (grep -Fiq "hg+" requirements.txt) then
   bpwatch start mercurial_install
-    /app/.heroku/python/bin/pip install --use-mirrors mercurial | cleanup | indent
+    /app/.heroku/python/bin/pip install --proxy http://proxy.de.abb.com:8080  --use-mirrors mercurial | cleanup | indent
   bpwatch stop mercurial_install
 fi
 
@@ -226,7 +226,7 @@ puts-step "Installing dependencies using Pip ($PIP_VERSION)"
 [ ! "$FRESH_PYTHON" ] && bpwatch start pip_install
 [ "$FRESH_PYTHON" ] && bpwatch start pip_install_first
 
-/app/.heroku/python/bin/pip install --use-mirrors -r requirements.txt --exists-action=w --src=./.heroku/src | cleanup | indent
+/app/.heroku/python/bin/pip install --proxy http://proxy.de.abb.com:8080 --use-mirrors -r requirements.txt --exists-action=w --src=./.heroku/src | cleanup | indent
 
 [ ! "$FRESH_PYTHON" ] && bpwatch stop pip_install
 [ "$FRESH_PYTHON" ] && bpwatch stop pip_install_first
